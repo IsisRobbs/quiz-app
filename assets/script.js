@@ -1,25 +1,35 @@
 const startButton = document.getElementById('start-btn');
+const nextButton = document.getElementById('next-btn')
 const questionContainerElement = document.getElementById('question-container');
 const questionElement = document.getElementById('question');
-const answerButtonsElement = document.getElementById('answer-buttons')
+const answerButtonsElement = document.getElementById('answer-buttons');
+
 let shuffledQuestions, currentQuestionIndex
 
-// Function to start to gam when you press start
-startButton.addEventListener('click', startGame)
 
+startButton.addEventListener('click', startGame);
+nextButton.addEventListener('click', () => {
+    currentQuestionIndex++
+    setNextQuestion()
+})
+
+// Function to start to game when you press start
 function startGame() {
 console.log('Started')
 startButton.classList.add('hide')
+// the shufflesd questions is our set array of questions being shuufled for each time the game is played
 shuffledQuestions = questions.sort(() => Math.random() - .5)
 currentQuestionIndex = 0
 questionContainerElement.classList.remove('hide')
 setNextQuestion()
 }
-
+// Set the next question after you answer on question. This function will shuuffle
+// which questgion goes next
 function setNextQuestion(){
+    resetState()
     showQuestion(shuffledQuestions[currentQuestionIndex])
 }
-
+// Function will show which question
 function showQuestion(question){
     questionElement.innerText = question.question
     question.answers.forEach(answer => {
@@ -33,17 +43,57 @@ function showQuestion(question){
         answerButtonsElement.appendChild(button)
     })
 }
-
-function selectAnswer(){
-
+// Reset after every question is asked to show the next button afterwards
+function resetState() {
+    clearStatusClass(document.body)
+    nextButton.classList.add('hide')
+    while (answerButtonsElement.firstChild) {
+        answerButtonsElement.removeChild(answerButtonsElement.firstChild)
+    }
+}
+// 
+function selectAnswer(e){
+const selectedButton = e.target
+const correct = selectedButton.dataset.correct
+setStatusClass(document.body, correct)
+Array.from(answerButtonsElement.children).forEach(button => {
+    setStatusClass(button, button.dataset.correct)
+})
+if (shuffledQuestions.length > currentQuestionIndex + 1) {
+    nextButton.classList.remove('hide')
+} else {
+startButton.innerText = 'Restart'
+startButton.classList.remove('hide')
+}
 }
 
+function setStatusClass(element, correct){
+    clearStatusClass(element)
+    if (correct) {
+        element.classList.add('correct')
+    } else {
+        element.classList.add('wrong')
+    }
+}
+
+function clearStatusClass(element) {
+    element.classList.remove('correct')
+    element.classList.remove('wrong')
+}
+// Array of the questions in the quiz
 const questions = [
     {
         question:"What is 2 + 2?",
         answers: [
             {text: '4', correct: true },
             {text: '22', correct: false }
+        ]
+    },
+    
+       { question: "What is 6 x 2?",
+        answers: [
+            {text: '12', correct: true},
+            {text: '8', correct: false}
         ]
     }
 ]
